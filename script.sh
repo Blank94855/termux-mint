@@ -14,27 +14,24 @@ config="$PREFIX/etc/fish/config.fish"
 clear
 
 prerequisite() {
-	{ echo; echo -e "${Yellow}checking dependencies..."${Cyan}; echo; }
-	if [[ (-f $PREFIX/bin/fish) && (-f $PREFIX/bin/figlet) && (-f $PREFIX/bin/neofetch) ]]; then
-		{ echo "${Green}all dependencies already installed."; }
-	else
-		{ pkg update -y; pkg install -y fish figlet neofetch -y; }
-		(type -p fish figlet neofetch &> /dev/null) && { echo; echo "${Green}dependencies installed."; } || { echo; echo "${Red}failed to install deps."; echo -e $Color_Off;  exit 1; }
-	fi
+    { echo; echo -e "${Yellow}checking dependencies..."${Cyan}; echo; }
+    if [[ (-f $PREFIX/bin/fish) && (-f $PREFIX/bin/figlet) && (-f $PREFIX/bin/neofetch) ]]; then
+        { echo "${Green}all dependencies already installed."; }
+    else
+        { pkg update -y; pkg install -y fish figlet neofetch -y; }
+        (type -p fish figlet neofetch &> /dev/null) && { echo; echo "${Green}dependencies installed."; } || { echo; echo "${Red}failed to install deps."; echo -e $Color_Off;  exit 1; }
+    fi
 }
 
 prerequisite
 
-set -U fish_greeting
-clear
+# set fish greeting by overwriting fish_greeting function in config.fish
+echo 'function fish_greeting
+    echo "welcome to mint os 1.0"
+end
+' > "$config"
 
-echo -e "function __fish_command_not_found_handler --on-event fish_command_not_found
-	/data/data/com.termux/files/usr/libexec/termux/command-not-found \$argv[1]
-end
-function cls
-    clear
-end
-" > "$config"
+clear
 
 echo -e $Purple
 figlet -f smslant "MintOS Shell"
