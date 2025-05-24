@@ -27,7 +27,7 @@ prerequisite
 
 # set fish greeting
 echo 'function fish_greeting
-    echo "welcome to MintOS 1.0"
+    echo "Welcome to MintOS 1.0.0"
 end
 
 function __fish_command_not_found_handler --on-event fish_command_not_found
