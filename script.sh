@@ -25,11 +25,29 @@ prerequisite() {
 
 prerequisite
 
-# set fish greeting by overwriting fish_greeting function in config.fish
+# set fish greeting
 echo 'function fish_greeting
-    echo "welcome to MintOS 1.0"
+    echo "Welcome to MintOS 1.0"
 end
 ' > "$config"
+
+# neofetch spoof alias + not found handler
+echo '
+function __fish_command_not_found_handler --on-event fish_command_not_found
+    /data/data/com.termux/files/usr/libexec/termux/command-not-found $argv[1]
+end
+
+function cls
+    clear
+end
+
+alias neofetch="neofetch --shell_version off"
+' >> "$config"
+
+# make custom config to override shell output
+mkdir -p ~/.config/neofetch
+neofetch --config none > ~/.config/neofetch/config.conf
+sed -i 's/info "Shell".*/info "Shell" "MintOS 1.0"/' ~/.config/neofetch/config.conf
 
 clear
 
@@ -67,4 +85,4 @@ chsh -s fish
 echo -e "*MintOS set as default shell*"
 sleep 2s
 printf '\n'
-printf  $Yellow"done.\n\nrestart termux.\n\n"
+printf $Yellow"done.\n\nrestart termux.\n\n"
