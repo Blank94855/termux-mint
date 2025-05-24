@@ -28,7 +28,7 @@ git clone https://github.com/Blank94855/termux-mint
 ```
 4)Change dir to the repo and give executable permissions to script.sh
 ```bash
-cd termux-fish && chmod +x script.sh
+cd termux-mint && chmod +x script.sh
 ```
 5)Run the script
 ```bash
