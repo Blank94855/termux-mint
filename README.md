@@ -4,10 +4,10 @@ This program will (permanently) install MintOS in termux and change the look of 
 For more info check fish documentation by clicking <a href="https://fishshell.com" target="_blank">here</a>
 <br>
 New look of termux:
-<img src="preview/Screenshot_20210419-131827_Termux.jpg">
+![Screenshot_20250524_192626_Termux](https://github.com/user-attachments/assets/0fe2ff16-80db-4428-9146-d069acec2527)
 <br><br>
 The script:
-<img src="preview/Screenshot_20210419-131801_Termux.jpg">
+![Screenshot_20250524_192549_Termux](https://github.com/user-attachments/assets/3fb6ceaa-90a1-45e9-a806-ec845b0ec4b3)
 <br><br>
 <i>To install, type this: :</i>
 ```bash
