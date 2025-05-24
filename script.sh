@@ -42,7 +42,11 @@ end
 # make neofetch custom config and override shell output
 mkdir -p ~/.config/neofetch
 neofetch --config none > ~/.config/neofetch/config.conf
-echo 'print_info() { info "Shell" "MintOS 1.0" }' >> ~/.config/neofetch/config.conf
+
+# This is the corrected part:
+sed -i 's/prin("Shell")/prin("Shell", "MintOS 1.0")/g' ~/.config/neofetch/config.conf
+sed -i 's/info "Shell" "\\\${shell_name}"/info "Shell" "MintOS 1.0"/g' ~/.config/neofetch/config.conf
+
 
 clear
 
