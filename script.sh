@@ -29,10 +29,7 @@ prerequisite
 echo 'function fish_greeting
     echo "Welcome to MintOS 1.0"
 end
-' > "$config"
 
-# neofetch spoof alias + not found handler
-echo '
 function __fish_command_not_found_handler --on-event fish_command_not_found
     /data/data/com.termux/files/usr/libexec/termux/command-not-found $argv[1]
 end
@@ -40,11 +37,9 @@ end
 function cls
     clear
 end
+' > "$config"
 
-alias neofetch="neofetch --shell_version off"
-' >> "$config"
-
-# make custom config to override shell output
+# make neofetch custom config
 mkdir -p ~/.config/neofetch
 neofetch --config none > ~/.config/neofetch/config.conf
 sed -i 's/info "Shell".*/info "Shell" "MintOS 1.0"/' ~/.config/neofetch/config.conf
@@ -68,8 +63,8 @@ sleep 2s
 while true; do
     read -p "show android logo on startup? (y/n): " yn
     case $yn in
-        [Yy]* ) echo "neofetch" >> "$config"; break;;
-        [Nn]* ) echo "neofetch --off" >> "$config"; break;;
+        [Yy]* ) echo "neofetch --config ~/.config/neofetch/config.conf" >> "$config"; break;;
+        [Nn]* ) echo "neofetch --off --config ~/.config/neofetch/config.conf" >> "$config"; break;;
         * ) echo "enter y or n";;
     esac
 done
