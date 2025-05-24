@@ -27,7 +27,7 @@ prerequisite
 
 # set fish greeting
 echo 'function fish_greeting
-    echo "Welcome to MintOS 1.0"
+    echo "welcome to MintOS 1.0"
 end
 
 function __fish_command_not_found_handler --on-event fish_command_not_found
@@ -39,10 +39,10 @@ function cls
 end
 ' > "$config"
 
-# make neofetch custom config
+# make neofetch custom config and override shell output
 mkdir -p ~/.config/neofetch
 neofetch --config none > ~/.config/neofetch/config.conf
-sed -i 's/info "Shell".*/info "Shell" "MintOS 1.0"/' ~/.config/neofetch/config.conf
+echo 'print_info() { info "Shell" "MintOS 1.0" }' >> ~/.config/neofetch/config.conf
 
 clear
 
