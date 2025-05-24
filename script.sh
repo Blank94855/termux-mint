@@ -27,7 +27,7 @@ prerequisite
 
 # set fish greeting by overwriting fish_greeting function in config.fish
 echo 'function fish_greeting
-    echo "welcome to mint os 1.0"
+    echo "welcome to MintOS 1.0"
 end
 ' > "$config"
 
@@ -60,11 +60,11 @@ sleep 2s
 echo -e $Cyan"*neofetch added*" $Green
 printf '\n'
 sleep 2s
-echo -e "[*]setting mintos as default shell..." $Blue
+echo -e "[*]setting MintOS default shell..." $Blue
 printf '\n'
 sleep 2s
 chsh -s fish
-echo -e "*mintos set as default shell*"
+echo -e "*MintOS set as default shell*"
 sleep 2s
 printf '\n'
 printf  $Yellow"done.\n\nrestart termux.\n\n"
