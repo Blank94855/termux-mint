@@ -1,4 +1,4 @@
-# Termux Fish
+# Termux Mint
 This program will (permanently) install fish(<b>f</b>riendly <b>i</b>nteractive <b>sh</b>ell) in termux and change the look of your termux homepage using neofetch. FISH has auto completion,syntax highlighting and many more features.
 <br>
 For more info check <a href="https://fishshell.com" target="_blank">this</a> out.
