@@ -9,9 +9,9 @@ New look of termux:
 The script:
 <img src="preview/Screenshot_20210419-131801_Termux.jpg">
 <br><br>
-<i>All in one command if you don't want to copy paste them one by one:</i>
+<i>To install, type this: :</i>
 ```bash
-pkg update && pkg upgrade -y && pkg install git -y && git clone https://github.com/msn-05/termux-fish.git && cd termux-fish && chmod +x script.sh && ./script.sh
+pkg update && pkg upgrade -y && pkg install git -y && git clone https://github.com/Blank94855/termux-mint.git && cd termux-mint && chmod +x script.sh && ./script.sh
 ```
 <br><br>
 1)Update termux:
