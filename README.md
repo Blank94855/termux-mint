@@ -1,7 +1,7 @@
 # Termux Mint
-This program will (permanently) install fish(<b>f</b>riendly <b>i</b>nteractive <b>sh</b>ell) in termux and change the look of your termux homepage using neofetch. FISH has auto completion,syntax highlighting and many more features.
+This program will (permanently) install MintOS in termux and change the look of your termux homepage using neofetch. MintOS has auto completion,syntax highlighting and many more features.
 <br>
-For more info check <a href="https://fishshell.com" target="_blank">this</a> out.
+For more info check fish documentation by clicking <a href="https://fishshell.com" target="_blank">here</a>
 <br>
 New look of termux:
 <img src="preview/Screenshot_20210419-131827_Termux.jpg">
@@ -24,7 +24,7 @@ pkg install git -y
 ```
 3)Clone this repo
 ```bash
-git clone https://github.com/msn-05/termux-fish.git
+git clone https://github.com/Blank94855/termux-mint
 ```
 4)Change dir to the repo and give executable permissions to script.sh
 ```bash
