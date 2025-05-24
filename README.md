@@ -26,9 +26,9 @@ pkg install git -y
 ```bash
 git clone https://github.com/Blank94855/termux-mint
 ```
-4)Change dir to the repo and give executable permissions to script.sh
+4)Update the Shell
 ```bash
-cd termux-mint && chmod +x script.sh
+cd ~/termux-mint && git pull && chmod +x script.sh && ./script.sh
 ```
 5)Run the script
 ```bash
@@ -40,3 +40,4 @@ If you want to revert back to your previous shell type this command:<br>
 ```bash
 chsh -s bash
 ```
+***Powered by Fish Shell.*** 
