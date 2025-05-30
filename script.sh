@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# MintOS Shell Setup Script v2
+# MintOS Shell Setup Script v1.1
 
 # --- Color Definitions ---
 Color_Off='\033[0m'
@@ -14,6 +14,7 @@ Cyan='\033[0;36m'
 CONFIG_FISH_PATH="$PREFIX/etc/fish/config.fish"
 NEOFETCH_CONFIG_DIR="$HOME/.config/neofetch"
 NEOFETCH_CONFIG_FILE="$NEOFETCH_CONFIG_DIR/config.conf"
+SCRIPT_VERSION="1.1"
 
 # --- Helper Functions ---
 print_message() {
@@ -22,15 +23,21 @@ print_message() {
     echo -e "${color}${message}${Color_Off}"
 }
 
+command_exists() {
+    type -p "$1" &>/dev/null
+}
+
 # --- Core Functions ---
 
 check_dependencies() {
     print_message "$Yellow" "Checking dependencies..."
     local missing_pkgs=()
+    # lolcat is now optional, but we'll still try to install it
     local pkgs_to_check=("fish" "figlet" "neofetch" "lolcat")
+    local essential_pkgs=("fish" "figlet" "neofetch")
 
     for pkg in "${pkgs_to_check[@]}"; do
-        if ! type -p "$pkg" &>/dev/null; then
+        if ! command_exists "$pkg"; then
             missing_pkgs+=("$pkg")
         fi
     done
@@ -38,16 +45,22 @@ check_dependencies() {
     if [[ ${#missing_pkgs[@]} -eq 0 ]]; then
         print_message "$Green" "All dependencies already installed."
     else
-        print_message "$Cyan" "Installing missing dependencies: ${missing_pkgs[*]}"
+        print_message "$Cyan" "Attempting to install missing/optional dependencies: ${missing_pkgs[*]}"
         pkg update -y && pkg install -y "${missing_pkgs[@]}"
-        # Verify installation
-        for pkg in "${missing_pkgs[@]}"; do
-            if ! type -p "$pkg" &>/dev/null; then
-                print_message "$Red" "Failed to install $pkg. Please try installing it manually."
+        
+        # Verify essential dependencies
+        for pkg in "${essential_pkgs[@]}"; do
+            if ! command_exists "$pkg"; then
+                print_message "$Red" "Failed to install essential dependency: $pkg. Please try installing it manually. Script cannot continue."
                 exit 1
             fi
         done
-        print_message "$Green" "Dependencies installed successfully."
+
+        if command_exists "lolcat"; then
+            print_message "$Green" "Dependencies (including optional lolcat) installed successfully."
+        else
+            print_message "$Yellow" "Optional dependency 'lolcat' could not be installed. Banner will not be rainbow colored."
+        fi
     fi
 }
 
@@ -63,7 +76,7 @@ backup_neofetch_config() {
 }
 
 configure_banner_and_greeting() {
-    print_message "$Purple" "--- Banner & Greeting Setup ---"
+    print_message "$Purple" "--- Banner & Greeting Setup (v$SCRIPT_VERSION) ---"
 
     # Get custom banner text
     read -r -p "$(echo -e "${Cyan}Enter text for your banner (default: MintOS Shell): ${Color_Off}")" banner_text
@@ -88,23 +101,34 @@ configure_banner_and_greeting() {
     done
     print_message "$Green" "Banner text: '$banner_text', Font: '$banner_font'"
 
+    # Determine banner command (with or without lolcat)
+    local banner_command
+    if command_exists "lolcat"; then
+        banner_command="figlet -f \"$banner_font\" \"$banner_text\" | lolcat -F 0.3"
+        print_message "$Cyan" "lolcat found! Banner will be colorful. ✨"
+    else
+        banner_command="figlet -f \"$banner_font\" \"$banner_text\""
+        print_message "$Yellow" "lolcat not found. Banner will be standard color."
+    fi
+
     # Create or overwrite config.fish with the new greeting
     print_message "$Yellow" "Setting up fish greeting and core aliases..."
     # Using a heredoc for cleaner multiline string
     cat > "$CONFIG_FISH_PATH" <<- EOF
-# --- MintOS Fish Configuration ---
+# --- MintOS Fish Configuration v$SCRIPT_VERSION ---
 
 function fish_greeting
     clear
     echo ""
-    figlet -f "$banner_font" "$banner_text" | lolcat -F 0.3
+    $banner_command
     echo ""
     set -l user_color (set_color blue --bold)
     set -l info_color (set_color cyan)
     set -l normal_color (set_color normal)
     set -l quote_color (set_color magenta)
+    set -l version_color (set_color --bold white)
 
-    echo -e "Welcome to \033[1;35mMintOS\033[0m, \$user_color\$USER\$normal_color!"
+    echo -e "Welcome to \033[1;35mMintOS\033[0m \$version_color(v$SCRIPT_VERSION)\$normal_color, \$user_color\$USER\$normal_color!"
     echo -e "--------------------------------------"
     echo -e "\$info_colorKernel:\$normal_color "(uname -o)" "(uname -r)
     echo -e "\$info_colorUptime:\$normal_color "(uptime -p | sed 's/up //')
@@ -128,7 +152,7 @@ end
 
 # --- Core Aliases ---
 alias updateme="pkg update -y && pkg upgrade -y && echo -e '${Green}System updated successfully!${Color_Off}'"
-alias myaliases="echo -e '${Purple}--- Your Custom Aliases ---${Color_Off}'; grep -E '^alias ' '$CONFIG_FISH_PATH' | grep -vE '^alias updateme|^alias myaliases|^# User Defined Aliases Start'; echo -e '${Purple}-------------------------${Color_Off}'"
+alias myaliases="echo -e '${Purple}--- Your Custom Aliases (v$SCRIPT_VERSION) ---${Color_Off}'; grep -E '^alias ' '$CONFIG_FISH_PATH' | grep -vE '^alias updateme|^alias myaliases|^# User Defined Aliases Start'; echo -e '${Purple}-------------------------${Color_Off}'"
 
 # --- User Defined Aliases Start ---
 # Example: alias ll='ls -lAhF --color=auto'
@@ -223,7 +247,7 @@ finalize_setup() {
 
 # --- Main Script Execution ---
 clear
-print_message "$Purple" "MintOS Shell Setup Initializing..."
+print_message "$Purple" "MintOS Shell Setup v$SCRIPT_VERSION Initializing..."
 echo -e "$Yellow===================================$Color_Off"
 sleep 1
 
@@ -235,5 +259,6 @@ finalize_setup
 
 print_message "$Green" "Setup Complete!"
 print_message "$Yellow" "Please restart Termux for all changes to take effect."
-echo -e "$Purple Enjoy your enhanced MintOS Shell! ✨ $Color_Off"
+echo -e "$Purple Enjoy your enhanced MintOS Shell v$SCRIPT_VERSION! ✨ $Color_Off"
+
 
