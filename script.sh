@@ -33,49 +33,50 @@ check_dependencies() {
     fi
     print_message "$Green" "Package lists updated successfully."
 
-    print_message "$Yellow" "Checking dependencies..."
-    local missing_pkgs_to_install=()
-    local pkgs_to_check=("fish" "figlet" "neofetch" "lolcat")
+    print_message "$Yellow" "Checking and installing dependencies..."
+    
     local essential_pkgs=("fish" "figlet" "neofetch")
+    local optional_pkgs=("lolcat") # lolcat is optional
 
-    for pkg in "${pkgs_to_check[@]}"; do
+    for pkg in "${essential_pkgs[@]}"; do
         if ! command_exists "$pkg"; then
-            missing_pkgs_to_install+=("$pkg")
+            print_message "$Cyan" "Attempting to install essential dependency: $pkg..."
+            if ! pkg install -y "$pkg"; then
+                print_message "$Red" "Failed to install essential dependency: $pkg using 'pkg install -y $pkg'."
+                print_message "$Red" "Please try installing it manually after ensuring 'pkg update' was successful."
+                print_message "$Red" "Script cannot continue."
+                exit 1
+            fi
+            # Re-check after install attempt
+            if ! command_exists "$pkg"; then
+                 print_message "$Red" "Essential dependency $pkg still not found after installation attempt."
+                 print_message "$Red" "There might be an issue with your Termux environment or repositories."
+                 exit 1
+            fi
+            print_message "$Green" "Essential dependency $pkg installed successfully."
+        else
+            print_message "$Green" "Essential dependency $pkg already installed."
         fi
     done
 
-    if [[ ${#missing_pkgs_to_install[@]} -eq 0 ]]; then
-        print_message "$Green" "All dependencies already installed."
-    else
-        print_message "$Cyan" "Attempting to install missing/optional dependencies: ${missing_pkgs_to_install[*]}"
-        if ! pkg install -y "${missing_pkgs_to_install[@]}"; then
-            print_message "$Yellow" "The package installation command (pkg install -y ...) reported an issue."
-            print_message "$Yellow" "Proceeding to verify essential packages..."
-        else
-            print_message "$Green" "Package installation command completed successfully."
-        fi
-        
-        local essential_pkg_failed=false
-        for pkg in "${essential_pkgs[@]}"; do
-            if ! command_exists "$pkg"; then
-                print_message "$Red" "Failed to install or verify essential dependency: $pkg."
-                essential_pkg_failed=true
+    print_message "$Green" "All essential dependencies are installed."
+
+    for pkg in "${optional_pkgs[@]}"; do
+        if ! command_exists "$pkg"; then
+            print_message "$Cyan" "Attempting to install optional dependency: $pkg..."
+            if pkg install -y "$pkg"; then
+                if command_exists "$pkg"; then
+                    print_message "$Green" "Optional dependency $pkg installed successfully."
+                else
+                    print_message "$Yellow" "Optional dependency $pkg installation command ran, but command still not found."
+                fi
+            else
+                print_message "$Yellow" "Failed to install optional dependency $pkg. This is not critical."
             fi
-        done
-
-        if $essential_pkg_failed; then
-            print_message "$Red" "One or more essential dependencies could not be installed."
-            print_message "$Red" "Please try installing them manually (e.g., 'pkg install fish') after ensuring 'pkg update' was successful."
-            print_message "$Red" "Script cannot continue."
-            exit 1
-        fi
-
-        if command_exists "lolcat"; then
-            print_message "$Green" "All essential dependencies installed. Optional 'lolcat' is also available."
         else
-            print_message "$Yellow" "All essential dependencies installed. Optional 'lolcat' could not be installed/found. Banner will not be rainbow colored."
+            print_message "$Green" "Optional dependency $pkg already installed."
         fi
-    fi
+    done
 }
 
 backup_neofetch_config() {
@@ -118,7 +119,7 @@ configure_banner_and_greeting() {
         print_message "$Cyan" "lolcat found! Banner will be colorful. ✨"
     else
         banner_command="figlet -f \"$banner_font\" \"$banner_text\""
-        print_message "$Yellow" "lolcat not found. Banner will be standard color."
+        print_message "$Yellow" "lolcat not found or failed to install. Banner will be standard color."
     fi
 
     print_message "$Yellow" "Setting up fish greeting and core aliases..."
@@ -262,4 +263,3 @@ print_message "$Yellow" "Please restart Termux for all changes to take effect."
 echo -e "$Purple Enjoy your enhanced MintOS Shell v$SCRIPT_VERSION! ✨ $Color_Off"
 
 
- 
