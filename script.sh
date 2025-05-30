@@ -1,7 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# MintOS Shell Setup Script v1.1
 
-# --- Color Definitions ---
 Color_Off='\033[0m'
 Red='\033[0;31m'
 Green='\033[1;32m'
@@ -10,13 +8,11 @@ Yellow='\033[1;33m'
 Purple='\033[0;35m'
 Cyan='\033[0;36m'
 
-# --- Global Variables ---
 CONFIG_FISH_PATH="$PREFIX/etc/fish/config.fish"
 NEOFETCH_CONFIG_DIR="$HOME/.config/neofetch"
 NEOFETCH_CONFIG_FILE="$NEOFETCH_CONFIG_DIR/config.conf"
 SCRIPT_VERSION="1.1"
 
-# --- Helper Functions ---
 print_message() {
     local color="$1"
     local message="$2"
@@ -27,12 +23,9 @@ command_exists() {
     type -p "$1" &>/dev/null
 }
 
-# --- Core Functions ---
-
 check_dependencies() {
     print_message "$Yellow" "Checking dependencies..."
     local missing_pkgs=()
-    # lolcat is now optional, but we'll still try to install it
     local pkgs_to_check=("fish" "figlet" "neofetch" "lolcat")
     local essential_pkgs=("fish" "figlet" "neofetch")
 
@@ -48,7 +41,6 @@ check_dependencies() {
         print_message "$Cyan" "Attempting to install missing/optional dependencies: ${missing_pkgs[*]}"
         pkg update -y && pkg install -y "${missing_pkgs[@]}"
         
-        # Verify essential dependencies
         for pkg in "${essential_pkgs[@]}"; do
             if ! command_exists "$pkg"; then
                 print_message "$Red" "Failed to install essential dependency: $pkg. Please try installing it manually. Script cannot continue."
@@ -71,18 +63,15 @@ backup_neofetch_config() {
         mv "$NEOFETCH_CONFIG_FILE" "$backup_file"
         print_message "$Green" "Neofetch config backed up."
     fi
-    # Ensure the directory exists for neofetch if it's being run for the first time
     mkdir -p "$NEOFETCH_CONFIG_DIR"
 }
 
 configure_banner_and_greeting() {
     print_message "$Purple" "--- Banner & Greeting Setup (v$SCRIPT_VERSION) ---"
 
-    # Get custom banner text
     read -r -p "$(echo -e "${Cyan}Enter text for your banner (default: MintOS Shell): ${Color_Off}")" banner_text
     banner_text=${banner_text:-"MintOS Shell"}
 
-    # Choose figlet font
     local fonts=("smslant" "standard" "slant" "big" "banner" "digital" "starwars" "larry3d")
     print_message "$Cyan" "Available figlet fonts:"
     for i in "${!fonts[@]}"; do
@@ -101,7 +90,6 @@ configure_banner_and_greeting() {
     done
     print_message "$Green" "Banner text: '$banner_text', Font: '$banner_font'"
 
-    # Determine banner command (with or without lolcat)
     local banner_command
     if command_exists "lolcat"; then
         banner_command="figlet -f \"$banner_font\" \"$banner_text\" | lolcat -F 0.3"
@@ -111,9 +99,7 @@ configure_banner_and_greeting() {
         print_message "$Yellow" "lolcat not found. Banner will be standard color."
     fi
 
-    # Create or overwrite config.fish with the new greeting
     print_message "$Yellow" "Setting up fish greeting and core aliases..."
-    # Using a heredoc for cleaner multiline string
     cat > "$CONFIG_FISH_PATH" <<- EOF
 # --- MintOS Fish Configuration v$SCRIPT_VERSION ---
 
@@ -176,7 +162,6 @@ configure_user_aliases() {
                     print_message "$Red" "Alias command cannot be empty. Skipping."
                     continue
                 fi
-                # Append the alias to config.fish
                 echo "alias $alias_name='$alias_command'" >> "$CONFIG_FISH_PATH"
                 print_message "$Green" "Alias '$alias_name' added."
                 ;;
@@ -189,14 +174,12 @@ configure_user_aliases() {
                 ;;
         esac
     done
-    # Add a closing marker for clarity, though not strictly necessary for grep
     echo "# --- User Defined Aliases End ---" >> "$CONFIG_FISH_PATH"
 }
 
 finalize_setup() {
     print_message "$Purple" "--- Finalizing Setup ---"
 
-    # Remove default Termux greeting
     print_message "$Blue" "[*] Removing default Termux greeting (motd)..."
     sleep 1
     [[ -f "$PREFIX/etc/motd" ]] && rm "$PREFIX/etc/motd"
@@ -204,7 +187,6 @@ finalize_setup() {
     printf '\n'
     sleep 1
 
-    # Configure Neofetch
     print_message "$Green" "[*] Adding Neofetch to MintOS..."
     sleep 1
     local neofetch_command="neofetch"
@@ -213,11 +195,10 @@ finalize_setup() {
         yn_neofetch=${yn_neofetch:-y}
         case $yn_neofetch in
             [Yy]* )
-                # Default neofetch command is fine
                 break
                 ;;
             [Nn]* )
-                neofetch_command="neofetch --off" # or your preferred neofetch config without logo
+                neofetch_command="neofetch --off"
                 break
                 ;;
             * )
@@ -225,14 +206,12 @@ finalize_setup() {
                 ;;
         esac
     done
-    # Add neofetch command to the end of config.fish, so it runs after the greeting
-    echo "" >> "$CONFIG_FISH_PATH" # Ensure it's on a new line
+    echo "" >> "$CONFIG_FISH_PATH"
     echo "$neofetch_command # Display Neofetch on startup" >> "$CONFIG_FISH_PATH"
     print_message "$Cyan" "* Neofetch configured to run on startup *"
     printf '\n'
     sleep 1
 
-    # Set Fish as default shell
     print_message "$Blue" "[*] Setting MintOS (Fish) as default shell..."
     sleep 1
     if [[ "$(basename "$SHELL")" != "fish" ]]; then
@@ -245,7 +224,6 @@ finalize_setup() {
     printf '\n'
 }
 
-# --- Main Script Execution ---
 clear
 print_message "$Purple" "MintOS Shell Setup v$SCRIPT_VERSION Initializing..."
 echo -e "$Yellow===================================$Color_Off"
