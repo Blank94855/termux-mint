@@ -24,34 +24,56 @@ command_exists() {
 }
 
 check_dependencies() {
+    print_message "$Yellow" "Updating package lists. This might take a moment..."
+    if ! pkg update -y; then
+        print_message "$Red" "Failed to update package lists (pkg update -y)."
+        print_message "$Red" "Please check your internet connection and Termux repositories."
+        print_message "$Red" "You might need to run 'termux-change-repo' and select different mirrors, then try the script again."
+        exit 1
+    fi
+    print_message "$Green" "Package lists updated successfully."
+
     print_message "$Yellow" "Checking dependencies..."
-    local missing_pkgs=()
+    local missing_pkgs_to_install=()
     local pkgs_to_check=("fish" "figlet" "neofetch" "lolcat")
     local essential_pkgs=("fish" "figlet" "neofetch")
 
     for pkg in "${pkgs_to_check[@]}"; do
         if ! command_exists "$pkg"; then
-            missing_pkgs+=("$pkg")
+            missing_pkgs_to_install+=("$pkg")
         fi
     done
 
-    if [[ ${#missing_pkgs[@]} -eq 0 ]]; then
+    if [[ ${#missing_pkgs_to_install[@]} -eq 0 ]]; then
         print_message "$Green" "All dependencies already installed."
     else
-        print_message "$Cyan" "Attempting to install missing/optional dependencies: ${missing_pkgs[*]}"
-        pkg update -y && pkg install -y "${missing_pkgs[@]}"
+        print_message "$Cyan" "Attempting to install missing/optional dependencies: ${missing_pkgs_to_install[*]}"
+        if ! pkg install -y "${missing_pkgs_to_install[@]}"; then
+            print_message "$Yellow" "The package installation command (pkg install -y ...) reported an issue."
+            print_message "$Yellow" "Proceeding to verify essential packages..."
+        else
+            print_message "$Green" "Package installation command completed successfully."
+        fi
         
+        local essential_pkg_failed=false
         for pkg in "${essential_pkgs[@]}"; do
             if ! command_exists "$pkg"; then
-                print_message "$Red" "Failed to install essential dependency: $pkg. Please try installing it manually. Script cannot continue."
-                exit 1
+                print_message "$Red" "Failed to install or verify essential dependency: $pkg."
+                essential_pkg_failed=true
             fi
         done
 
+        if $essential_pkg_failed; then
+            print_message "$Red" "One or more essential dependencies could not be installed."
+            print_message "$Red" "Please try installing them manually (e.g., 'pkg install fish') after ensuring 'pkg update' was successful."
+            print_message "$Red" "Script cannot continue."
+            exit 1
+        fi
+
         if command_exists "lolcat"; then
-            print_message "$Green" "Dependencies (including optional lolcat) installed successfully."
+            print_message "$Green" "All essential dependencies installed. Optional 'lolcat' is also available."
         else
-            print_message "$Yellow" "Optional dependency 'lolcat' could not be installed. Banner will not be rainbow colored."
+            print_message "$Yellow" "All essential dependencies installed. Optional 'lolcat' could not be installed/found. Banner will not be rainbow colored."
         fi
     fi
 }
@@ -240,3 +262,4 @@ print_message "$Yellow" "Please restart Termux for all changes to take effect."
 echo -e "$Purple Enjoy your enhanced MintOS Shell v$SCRIPT_VERSION! ✨ $Color_Off"
 
 
+ 
